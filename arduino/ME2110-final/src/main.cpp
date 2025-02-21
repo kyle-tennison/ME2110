@@ -1,18 +1,23 @@
-#include <Arduino.h>
+#include "Arduino.h"
+#include "myDuino.h"
 
-// put function declarations here:
-int myFunction(int, int);
 
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+myDuino* client;
+
+
+void setup(){
+  Serial.begin(9600);
+  client = new myDuino(1);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+void loop(){
+  if (client->readButton(2) == 1){
+    client->digital(2, 1);
+    Serial.println("on");
+  }
+  else{
+    client->digital(2, 0);
+    Serial.println("off");
+  }
 }
