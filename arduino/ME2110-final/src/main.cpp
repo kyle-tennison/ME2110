@@ -1,58 +1,77 @@
 #include <myDuino.h>
 
-myDuino robot(1);
-
 // Pin numbers 
-const int bananaPin = 0;
-const int motor1Pin = 1;    // Output for motor 1 (M1)
-const int motor2Pin = 2;    // Output fpr motor 2 (M2)
-const int piston1Pin  = 1;  // Output for peumatic valve 1 (DO1)
-const int piston2Pin  = 2;  // Output for piston 2 (DO2)
+#define BANANA_PIN 0
+#define MOTOR1_PIN 1    // Output for motor 1 (M1)
+#define MOTOR2_PIN 2    // Output for motor 2 (M2)
+#define PISTON1_PIN 1   // Output for pneumatic valve 1 (DO1)
+#define PISTON2_PIN 2   // Output for piston 2 (DO2)
 
 // Timeout duration (40 seconds = 40000 milliseconds)
-const unsigned long timeout = 40000;
+#define TIMEOUT 39000
 
 // Variables to track the start state and timing
 bool started = false;
+bool ended = false;
 unsigned long startTime = 0;
 
-void setup() {
+// Robot instance pointer
+myDuino* robot;
 
+void setup() {
   Serial.begin(9600);
+  
+  // Initialize robot
+  robot = new myDuino(1);
 
   // Make sure pistons are off at startup
-  robot.digital(piston1Pin, 0);
-  robot.digital(piston2Pin, 0);
+  robot->digital(PISTON1_PIN, 0);
+  robot->digital(PISTON2_PIN, 0);
 }
 
-void loop() {
-  // This code replaces with banana clip detection with a button detection
-  bool state = robot.readButton(2); // returns 0 if pressed/shorted, 1 if released/not shorted
 
-  // Wait for the start signal: banana plug is shorted (pin goes LOW)
-  if (!started && (state == 0)) { //digitalRead(bananaPin) == LOW) {
+// Called at the start of the match
+void on_start(){
     // Activate both pistons upon start
-    robot.digital(piston1Pin, 1);
-    robot.digital(piston2Pin, 1);
+    robot->digital(PISTON1_PIN, 1);
+    robot->digital(PISTON2_PIN, 1);
 
     // Record the start time
     startTime = millis();
-    started = true;
 
     // Move motor at start
-    robot.moveMotor(motor1Pin,1,255);
+    robot->moveMotor(MOTOR1_PIN, 1, 255);
+}
+
+// Called at the end of the match
+void on_end(){
+  // Deactivate the pistons
+  robot->digital(PISTON1_PIN, 1);
+  robot->digital(PISTON2_PIN, 2);
+
+  // Deactivate the motor
+  robot->moveMotor(MOTOR1_PIN, 1, 0);
+}
+
+
+void loop() {
+
+  if (ended){
+    return;
+  }
+
+  // This code replaces banana clip detection with a button detection
+  bool banana_clips_shorted = robot->readButton(2) == 1; // returns 0 if pressed/shorted, 1 if released/not shorted
+
+  // Wait for the start signal: banana plug is shorted (pin goes LOW)
+  if (!started && banana_clips_shorted) {
+    on_start();
+    started=true;
   }
   
   // Check if 40 seconds have elapsed since the start signal
-  if (started && (millis() - startTime >= timeout)) {
-    // Deactivate the pistons
-    robot.digital(piston1Pin, 1);
-    robot.digital(piston2Pin, 2);
-
-    // Deactivate the motor
-    robot.moveMotor(motor1Pin,1,0);
-    
-    // Optionally, prevent re-triggering by not resetting "started"
-    // If you want the process to be restartable, you could reset started here.
+  if (started && (millis() - startTime >= TIMEOUT)) {
+    on_end();
+    ended=true;
   }
 }
