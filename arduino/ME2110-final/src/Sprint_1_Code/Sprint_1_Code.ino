@@ -20,9 +20,6 @@ void setup() {
 
   Serial.begin(9600);
 
-  // Ensure motor is on immediately and remains on always.
-  robot.moveMotor(motor1Pin,1,0);
-
   // Make sure pistons are off at startup
   robot.digital(piston1Pin, 0);
   robot.digital(piston2Pin, 0);
@@ -41,6 +38,9 @@ void loop() {
     // Record the start time
     startTime = millis();
     started = true;
+
+    // Move motor at start
+    robot.moveMotor(motor1Pin,1,255);
   }
   
   // Check if 40 seconds have elapsed since the start signal
@@ -50,7 +50,7 @@ void loop() {
     robot.digital(piston2Pin, 2);
 
     // Deactivate the motor
-    robot.moveMotor(motor1Pin,1,255);
+    robot.moveMotor(motor1Pin,1,0);
     
     // Optionally, prevent re-triggering by not resetting "started"
     // If you want the process to be restartable, you could reset started here.
