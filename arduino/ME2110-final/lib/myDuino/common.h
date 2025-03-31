@@ -1,0 +1,46 @@
+#ifndef COMMON_H
+#define COMMON_H
+
+// Pin numbers 
+#include "Arduino.h"
+#include "myDuino.h"
+
+#define BANANA_PIN 4 // Read; Banana pin input
+#define TUNE_SWITCH_1 3 // Read; 1st toggle switch
+#define TUNE_SWITCH_2 2 // Read; 2nd toggle switch
+#define PISTON1_PIN 1 // Write; 1st pneumatic valve
+#define PISTON2_PIN 2 // Write; 2nd pneumatic valve
+#define SOLENOID_PIN 3 // Write; Dog bone solenoid
+#define ORE_MOTOR_PIN 2 // Motor; 
+#define BAG_MOTOR_PIN 1 // Motor;
+
+// Timeout duration (40 seconds = 40000 milliseconds)
+#define TIMEOUT 38000 // milliseconds
+
+// Potentiometer values
+#define POTENTIOMETER_MIN 0
+#define POTENTIOMETER_MAX 658
+
+// Dog bone settings
+#define TUNABLE_WINDOW 90.0 // Tunable window for potentiometer in degrees
+#define PLATE_ANGULAR_VEL 10 // RPM
+
+// Bag settings
+#define BAG_MOTOR_DURATION 4000 // milliseconds
+#define BAG_START_DELAY 6000 // milliseconds
+
+// Debug command
+#define DEBUG
+#ifdef DEBUG
+  #define debug_print(x) Serial.print(x)
+  #define debug_println(x) Serial.println(x)
+#else
+  // No-op when DEBUG is not defined
+  #define debug_print(x) 
+  #define debug_println(x) 
+#endif
+
+// Robot instance pointer
+extern myDuino* robot;
+
+#endif
