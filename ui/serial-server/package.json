@@ -1,0 +1,20 @@
+{
+  "name": "serial-server",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "serialport": "^13.0.0",
+    "ws": "^8.18.1"
+  },
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  }
+}

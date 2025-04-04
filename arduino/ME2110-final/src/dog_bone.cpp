@@ -5,8 +5,8 @@
 #include <dog_bone.h>
 
 /// @brief Read the tower information set by the control panel
-/// @return A `TowerInfo` struct
-TowerInfo read_tower_info(){
+/// @return A `TowerConfig` struct
+TowerConfig read_tower_config(){
 
     // Read the input from the switches
     bool in1 = robot->readButton(TUNE_SWITCH_1) == 1; // switches are flipped
@@ -64,7 +64,7 @@ TowerInfo read_tower_info(){
     debug_print("DEBUG: Final relative angle is: ");
     debug_println(relative_angle);
 
-    TowerInfo info;
+    TowerConfig info;
     info.orientation = orientation;
     info.relative_angle = relative_angle;
     return info;
@@ -75,41 +75,44 @@ TowerInfo read_tower_info(){
 /// @return An unsigned long integer of the number of miliseconds to wait *after start*
 uint32_t compute_dog_bone_delay(){
 
-    const double rot_period = 60 / PLATE_ANGULAR_VEL;
-    const TowerInfo tower_info = read_tower_info();
+    debug_print("DEBUG: The rotation period is: ");
+    debug_print(PLATE_ROT_PERIOD);
+    debug_println("ms");
 
-    double delay = rot_period; // by default allow one rotation to go by
+    const TowerConfig tower_config = read_tower_config();
 
-    switch (tower_info.orientation){
+    double target_angle;
+
+    switch (tower_config.orientation){
         case TowerOrientation::Facing:
-            delay += 0;
+            target_angle =0;
             break;
         case TowerOrientation::Right:
-            delay += (1/4) * rot_period;
+            target_angle = 90;
             break;
         case TowerOrientation::Behind:
-            delay += (2/4) * rot_period;
+            target_angle = 180;
             break;
         case TowerOrientation::Left:
-            delay += (3/4) * rot_period;
-            break;
-        default:
+            target_angle = 270;
             break;
     }
 
-    const float percent_wait =  float(tower_info.relative_angle) / (TUNABLE_WINDOW);
 
-    debug_print("INFO: Dog bone tune set to ");
-    debug_print(percent_wait);
-    debug_println("% wait");
+    debug_print("DEBUG: Angle before considering tuning: ");
+    debug_println(target_angle);
 
+    target_angle -= tower_config.relative_angle;
 
-    const uint16_t wait_milliseconds = percent_wait * (rot_period/4);
+    debug_print("DEBUG: Angle after considering tuning: ");
+    debug_println(target_angle);
+
+    const uint16_t wait_time = static_cast<uint16_t>((target_angle/360)*PLATE_ROT_PERIOD + PLATE_ROT_PERIOD);
+
     debug_print("INFO: Waiting for ");
-    debug_print(wait_milliseconds);
-    debug_println(" milliseconds to dispense dog bone.");
+    debug_println(wait_time);
 
-    return wait_milliseconds;
+    return wait_time;
 }
 
 /// @brief Dispense the dog bone by triggering the solenoid release
