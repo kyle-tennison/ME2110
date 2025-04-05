@@ -7,7 +7,7 @@
 myDuino* robot = nullptr;
 
 void unspool(){
-  Serial.println("Starting unspool");
+  debug_println("!Starting unspool");
 
   bool in1, in2;
 
@@ -16,10 +16,10 @@ void unspool(){
       in1 = robot->readButton(TUNE_SWITCH_1) == 1; // switches are flipped
       in2 = robot->readButton(TUNE_SWITCH_2) == 0;
 
-      Serial.print("in1: ");
-      Serial.print(in1);
-      Serial.print("; in2: ");
-      Serial.println(in2);
+      debug_print("!in1: ");
+      debug_print(in1);
+      debug_print("; in2: ");
+      debug_println(in2);
 
 
       if ((!in1 && !in2) || (in1 && in2)){
@@ -48,30 +48,25 @@ void setup() {
 }
 
 
+TelemetryPayload read_telem(){
+  TelemetryPayload data;
+  data.in1 = robot->readButton(TUNE_SWITCH_1) == 0;
+  data.in2 = robot->readButton(TUNE_SWITCH_2) == 1;
+  data.pot = (100*robot->readPOT())/(POTENTIOMETER_MAX);
+  data.op = OpMode::BAG;
+
+  return data;
+}
+
 uint32_t last_heartbeat = 0;
 
 void loop() {
 
-    TelemetryPayload data;
-    data.in1 = true;
-    data.in2 = true;
-    data.pot = 100;
-    data.op = OpMode::BAG;
+    TelemetryPayload telem = read_telem();
 
-
-    if ((millis() - last_heartbeat) > 1000){
-      last_heartbeat = millis();
-      send_payload(&data);
-    }
-
-    Serial.print("Bytes availabe: ");
-    Serial.println(Serial.available());
+    send_payload(&telem);
 
     if (Serial.available() > 0){
       read_incoming();
     }
-
-
-    delay(1000);
-
 }

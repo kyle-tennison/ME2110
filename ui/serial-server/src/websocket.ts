@@ -5,11 +5,14 @@ export function startWebSocketServer(port = 8080) {
   const wss = new WebSocketServer({ port });
 
   serialEmitter.on("data", (line) => {
+    let count = 0;
     wss.clients.forEach((client) => {
       if (client.readyState === client.OPEN) {
         client.send(line);
+        count += 1;
       }
     });
+    console.log(`Relayed message to ${count} clients`)
   });
 
     // Listen for incoming messages from clients

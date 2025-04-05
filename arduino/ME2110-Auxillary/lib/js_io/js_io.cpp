@@ -14,11 +14,12 @@ void send_payload(TelemetryPayload* data) {
   doc["op"] = data->op;
 
   serializeJson(doc, Serial);
+  Serial.println(); // Send \r\n to signal break
 }
 
 
 CommandPayload read_incoming() {
-  Serial.println("Reading incoming message");
+  debug_println("!Reading incoming message");
 
   char inputBuffer[BUFFER_SIZE];
   int bufferIndex = 0;
@@ -38,12 +39,12 @@ CommandPayload read_incoming() {
       } else {
         // If buffer is full, reset to start again (optional)
         bufferIndex = 0;
-        debug_println("Buffer overflow! Resetting...");
+        debug_println("!Buffer overflow! Resetting...");
       }
     }
   }
 
-  debug_print("Final buffer is: ");
+  debug_print("!Final buffer is: ");
   debug_println(inputBuffer);
 
   char* json_string = &inputBuffer[0];

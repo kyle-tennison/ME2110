@@ -25,8 +25,8 @@ html, body {
   }
   
   .logo-block {
-    right: 2rem;    /* adjust as needed */
-    top: 2rem;
+    position: relative;
+    left: 50px;
     font-weight: bold;
     letter-spacing: 3px;
     filter: invert(100%);
@@ -51,6 +51,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 40px;
   margin-bottom: 2rem;
   position: relative;
   aspect-ratio: 16 / 9;
