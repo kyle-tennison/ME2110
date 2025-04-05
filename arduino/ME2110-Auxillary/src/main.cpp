@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <myDuino.h>
 #include <common.h>
+#include <js_io.h>
 
 
 myDuino* robot = nullptr;
@@ -46,8 +47,30 @@ void setup() {
   // unspool();
 }
 
+
+uint32_t last_heartbeat = 0;
+
 void loop() {
-    Serial.println("Hello from Arduino");
+
+    Payload data;
+    data.tmp = 3.14;
+    data.val = 6;
+
+
+    if ((millis() - last_heartbeat) > 1000){
+      last_heartbeat = millis();
+      // send_payload(&data);
+      Serial.println("heartbeat");
+    }
+
+    Serial.print("Bytes availabe: ");
+    Serial.println(Serial.available());
+
+    if (Serial.available() > 0){
+      read_incoming();
+    }
+
+
     delay(1000);
 
 }
