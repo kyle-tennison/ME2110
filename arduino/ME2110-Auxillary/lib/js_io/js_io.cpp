@@ -59,5 +59,7 @@ CommandPayload read_incoming() {
   payload.ground_ore_collector = doc["ground_ore_collector"];
   payload.dog_bone = doc["dog_bone"];
 
+  debug_println("!Sucessfully deserialized inbound command");
+
   return payload;
 }

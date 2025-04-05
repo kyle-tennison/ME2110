@@ -17,7 +17,7 @@ struct CommandPayload {
 struct TelemetryPayload {
   bool in1;
   bool in2;
-  uint16_t pot;
+  int8_t pot;
   OpMode op;
   };
 

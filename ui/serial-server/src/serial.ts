@@ -61,6 +61,9 @@ export function sendToArduino(data: string) {
       if (err) {
         console.error("Error writing to serial port:", err);
       }
+      else {
+        console.debug("Wrote to arduino.");
+      }
     });
   } else {
     console.log("Serial port not open.");

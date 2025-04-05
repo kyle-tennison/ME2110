@@ -66,7 +66,12 @@ void loop() {
 
     send_payload(&telem);
 
+    debug_print("!Available bytes: ");
+    debug_println(Serial.available());
+
     if (Serial.available() > 0){
       read_incoming();
     }
+
+    delay(1000);
 }

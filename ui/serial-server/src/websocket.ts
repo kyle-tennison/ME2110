@@ -21,8 +21,9 @@ export function startWebSocketServer(port = 8080) {
       console.log(`Made connection on websocket.`)
 
       client.on('message', (message) => {
-        console.log('Received message from client:', message);
-        sendToArduino(message.toString());
+        const data = message.toString();
+        console.log('Received message from client: ', data);
+        sendToArduino(data);
       });
     });
 

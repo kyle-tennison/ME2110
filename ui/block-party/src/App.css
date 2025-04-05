@@ -21,7 +21,8 @@ html, body {
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 30px;
+  margin-left: 20px;
   }
   
   .logo-block {
