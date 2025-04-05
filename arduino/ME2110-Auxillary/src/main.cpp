@@ -52,15 +52,16 @@ uint32_t last_heartbeat = 0;
 
 void loop() {
 
-    Payload data;
-    data.tmp = 3.14;
-    data.val = 6;
+    TelemetryPayload data;
+    data.in1 = true;
+    data.in2 = true;
+    data.pot = 100;
+    data.op = OpMode::BAG;
 
 
     if ((millis() - last_heartbeat) > 1000){
       last_heartbeat = millis();
-      // send_payload(&data);
-      Serial.println("heartbeat");
+      send_payload(&data);
     }
 
     Serial.print("Bytes availabe: ");

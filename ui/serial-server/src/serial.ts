@@ -1,15 +1,23 @@
 import { SerialPort } from "serialport";
 import { EventEmitter } from "events";
 import { ReadlineParser } from "@serialport/parser-readline";
+import dotenv from "dotenv";
+
+// Load environment variables from the .env file
+dotenv.config();
 
 interface Payload {
   val: number;
   tmp: number;
 }
+
 export const serialEmitter = new EventEmitter();
 
+// Read the DEVICE_PATH from the environment variables
+const devicePath = process.env.DEVICE_PATH || "/dev/cu.usbmodem1101";  // Fallback to a default path if not set
+
 const port = new SerialPort({
-  path: "/dev/cu.usbmodem1101",
+  path: devicePath,
   baudRate: 9600,
   autoOpen: true,
 });
@@ -25,10 +33,9 @@ port.on("open", () => {
 
 const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
 parser.on("data", (data: string) => {
-  console.log(`Incoming data: ${data}`)
-  // const payload: Payload = JSON.parse(data);
-  // console.log('Received Payload:', payload);
-  // serialEmitter.emit("data", payload);
+  const payload: Payload = JSON.parse(data);
+  console.log('Received Payload:', payload);
+  serialEmitter.emit("data", payload);
 });
 
 export function sendToArduino(data: string) {
@@ -42,6 +49,3 @@ export function sendToArduino(data: string) {
     console.log("Serial port not open.");
   }
 }
-
-
-

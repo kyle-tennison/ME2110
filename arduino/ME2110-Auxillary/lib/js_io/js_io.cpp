@@ -5,17 +5,19 @@
 #define BUFFER_SIZE 128
 
 
-void send_payload(Payload* data) {
+void send_payload(TelemetryPayload* data) {
   JsonDocument doc;
 
-  doc["val"] = data->val;
-  doc["tmp"] = data->tmp;
+  doc["in1"] = data->in1;
+  doc["in2"] = data->in2;
+  doc["pot"] = data->pot;
+  doc["op"] = data->op;
 
   serializeJson(doc, Serial);
 }
 
 
-void read_incoming() {
+CommandPayload read_incoming() {
   Serial.println("Reading incoming message");
 
   char inputBuffer[BUFFER_SIZE];
@@ -50,6 +52,11 @@ void read_incoming() {
   JsonDocument doc;
   deserializeJson(doc, json_string, bufferIndex);
 
+  CommandPayload payload;
 
+  payload.top_ore_collector = doc["top_ore_collector"];
+  payload.ground_ore_collector = doc["ground_ore_collector"];
+  payload.dog_bone = doc["dog_bone"];
 
+  return payload;
 }

@@ -1,5 +1,5 @@
 import { WebSocketServer } from "ws";
-import { serialEmitter } from "./serial.ts";
+import { sendToArduino, serialEmitter } from "./serial.ts";
 
 export function startWebSocketServer(port = 8080) {
   const wss = new WebSocketServer({ port });
@@ -11,6 +11,18 @@ export function startWebSocketServer(port = 8080) {
       }
     });
   });
+
+    // Listen for incoming messages from clients
+    wss.on('connection', (client) => {
+
+      console.log(`Made connection on websocket.`)
+
+      client.on('message', (message) => {
+        console.log('Received message from client:', message);
+        sendToArduino(message.toString());
+      });
+    });
+
 
   console.log(`WebSocket server running on ws://localhost:${port}`);
 }
