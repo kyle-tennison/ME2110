@@ -3,6 +3,7 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
+  background-color: rgb(32, 32, 32);
   }
 
   .app-container {
@@ -14,6 +15,7 @@ html, body {
     padding-top: 25px;
     padding-bottom: 10px;
     box-sizing: border-box;
+    mix-blend-mode: exclusion;
     }
   
   .left-panel {

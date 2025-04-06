@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 function ControlBoardCard() {
-  const [topOre, setTopOre] = useState(true);
-  const [groundOre, setGroundOre] = useState(true);
+  const [topOre, setTopOre] = useState(false);
+  const [groundOre, setGroundOre] = useState(false);
   const [dogBone, setDogBone] = useState(false);
 
   // Create a ref to hold the WebSocket
@@ -38,9 +38,9 @@ function ControlBoardCard() {
       return;
     }
     const payload = {
-      top_ore_collector: topOre,
-      ground_ore_collector: groundOre,
-      dog_bone: dogBone,
+      to: topOre,
+      go: groundOre,
+      db: dogBone,
     };
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify(payload));

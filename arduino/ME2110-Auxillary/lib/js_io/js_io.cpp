@@ -2,7 +2,7 @@
 #include <js_io.h>
 #include <common.h>
 
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE 512
 
 
 void send_payload(TelemetryPayload* data) {
@@ -24,20 +24,16 @@ CommandPayload read_incoming() {
   char inputBuffer[BUFFER_SIZE];
   int bufferIndex = 0;
 
-  while (Serial.available() > 0){
-
+  while (Serial.available() > 0) {
     const char incomingByte = Serial.read();
-
     if (incomingByte == '\n' || incomingByte == '\r') {
       inputBuffer[bufferIndex] = '\0'; // Null-terminate the string
-    }
-    else {
-      // Store the byte in the buffer if there's space
+      break; // Stop reading further bytes.
+    } else {
       if (bufferIndex < BUFFER_SIZE - 1) {
         inputBuffer[bufferIndex] = incomingByte;
         bufferIndex++;
       } else {
-        // If buffer is full, reset to start again (optional)
         bufferIndex = 0;
         debug_println("!Buffer overflow! Resetting...");
       }
@@ -55,9 +51,9 @@ CommandPayload read_incoming() {
 
   CommandPayload payload;
 
-  payload.top_ore_collector = doc["top_ore_collector"];
-  payload.ground_ore_collector = doc["ground_ore_collector"];
-  payload.dog_bone = doc["dog_bone"];
+  payload.to = doc["to"];
+  payload.go = doc["go"];
+  payload.db = doc["db"];
 
   debug_println("!Sucessfully deserialized inbound command");
 

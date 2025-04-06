@@ -12,10 +12,10 @@ function RobotStatusCard() {
   // Initialize state for our status values.
 
   const defaultStatus = {
-    switch1: 'OFF',
-    switch2: 'OFF',
-    potentiometer: '0%',
-    status: 'Unknown',
+    switch1: 'Unknown',
+    switch2: 'Unknown',
+    potentiometer: 'Unknown',
+    status: 'Disconnected',
     mode: 'Unknown',
   };
 

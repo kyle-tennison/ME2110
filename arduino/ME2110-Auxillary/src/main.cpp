@@ -7,71 +7,99 @@
 myDuino* robot = nullptr;
 
 void unspool(){
-  debug_println("!Starting unspool");
-
   bool in1, in2;
 
-  while (true){
-      // Read the input from the switches
-      in1 = robot->readButton(TUNE_SWITCH_1) == 1; // switches are flipped
-      in2 = robot->readButton(TUNE_SWITCH_2) == 0;
-
-      debug_print("!in1: ");
-      debug_print(in1);
-      debug_print("; in2: ");
-      debug_println(in2);
+    // Read the input from the switches
+    in1 = robot->readButton(TUNE_SWITCH_1) == 1;
+    in2 = robot->readButton(TUNE_SWITCH_2) == 1;
 
 
-      if ((!in1 && !in2) || (in1 && in2)){
-        // do nothing
-        robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
-        continue;
-      }
-      else if (in1){
-        robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
-      }
-      else if (in2){
-        robot->moveMotor(BAG_MOTOR_PIN, 2, 255);
-      }
-  }
+    if ((!in1 && !in2) || (in1 && in2)){
+      // do nothing
+      robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
+      return;
+    }
+    else if (in1){
+      robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
+    }
+    else if (in2){
+      robot->moveMotor(BAG_MOTOR_PIN, 2, 255);
+    }
 
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   
   // Initialize robot
   robot = new myDuino(1);
-  robot->LED(2, 1);
-
-  // unspool();
+  robot->LED(1, 1);
 }
 
-
+/// @brief Read the telemetry of the robot
+/// @return A TelemetryPayload struct
 TelemetryPayload read_telem(){
   TelemetryPayload data;
-  data.in1 = robot->readButton(TUNE_SWITCH_1) == 0;
+  data.in1 = robot->readButton(TUNE_SWITCH_1) == 1;
   data.in2 = robot->readButton(TUNE_SWITCH_2) == 1;
-  data.pot = (100*robot->readPOT())/(POTENTIOMETER_MAX);
+  data.pot = (robot->readPOT());
   data.op = OpMode::BAG;
 
   return data;
+}
+
+/// @brief Handle an incoming command
+/// @param payload The incomming command
+void dispatch_command(CommandPayload payload){
+  debug_println("!Dispatching command");
+  
+  if (payload.db){
+    debug_println("!Triggerring dog bone ON");
+    robot->digital(SOLENOID_PIN, 1);
+  }
+  else{
+    debug_println("!Triggerring dog bone OFF");
+    robot->digital(SOLENOID_PIN, 0);
+  };
+  if (payload.go){
+    debug_println("!Triggerring bottom ore collector ON");
+    robot->digital(PNEU_ORE_PIN, 1);
+  }
+  else {
+    debug_println("!Triggerring bottom ore collector OFF");
+    robot->digital(PNEU_ORE_PIN, 0);
+  }
+  if (payload.to){
+    debug_println("!Triggering top ore collector ON");
+    robot->moveMotor(ORE_MOTOR_PIN, 1, 255);
+  }
+  else {
+    debug_println("!Triggering top ore collector OFF");
+    robot->moveMotor(ORE_MOTOR_PIN, 1, 0);
+  }
+
 }
 
 uint32_t last_heartbeat = 0;
 
 void loop() {
 
-    TelemetryPayload telem = read_telem();
-
-    send_payload(&telem);
-
-    debug_print("!Available bytes: ");
-    debug_println(Serial.available());
-
-    if (Serial.available() > 0){
-      read_incoming();
+  TelemetryPayload telem = read_telem();
+    if (millis() - last_heartbeat > 100){
+      send_payload(&telem);
+      debug_print("!Available bytes: ");
+      debug_println(Serial.available());
+      last_heartbeat=millis();
     }
 
-    delay(1000);
+
+    if (Serial.available() > 0){
+      delay(50);
+      CommandPayload command = read_incoming();
+      dispatch_command(command);
+    }
+
+    if (telem.op == OpMode::BAG){
+      unspool();
+    }
 }

@@ -22,7 +22,7 @@ let port: SerialPort;
 try {
   port = new SerialPort({
     path: devicePath,
-    baudRate: 9600,
+    baudRate: 115200,
     autoOpen: true,
   });
 }

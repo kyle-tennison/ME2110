@@ -8,16 +8,16 @@ enum OpMode {
 
 /// @brief Inbound payload to Arduino
 struct CommandPayload {
-  bool top_ore_collector;
-  bool ground_ore_collector;
-  bool dog_bone; 
+  bool to;
+  bool go;
+  bool db; 
 };
 
 /// @brief Outbound payload to TS
 struct TelemetryPayload {
   bool in1;
   bool in2;
-  int8_t pot;
+  int16_t pot;
   OpMode op;
   };
 
