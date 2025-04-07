@@ -16,7 +16,7 @@ void timer_expre(){
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   debug_println("INFO: Debugging enabled");
   
   // Initialize robot
@@ -42,6 +42,9 @@ void on_end(){
   // Deactivate the solenoid
   robot->digital(SOLENOID_PIN, 0);
   robot->LED(1, 1);
+
+  // Stall forever
+  while (true){}
 }
 
 void end_move_bag(){

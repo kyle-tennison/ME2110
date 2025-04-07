@@ -30,7 +30,7 @@
 #define BAG_START_DELAY 6000 // milliseconds
 
 // Debug command
-// #define DEBUG
+#define DEBUG
 #ifdef DEBUG
   #define debug_print(x) Serial.print(x)
   #define debug_println(x) Serial.println(x)
