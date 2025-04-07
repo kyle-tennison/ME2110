@@ -16,7 +16,7 @@ void timer_expre(){
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   debug_println("INFO: Debugging enabled");
   
   // Initialize robot
@@ -24,16 +24,16 @@ void setup() {
   robot->LED(2, 1);
 
   // Make sure pistons are off at startup
-  robot->digital(PISTON1_PIN, 0);
-  robot->digital(PISTON2_PIN, 0);
+  robot->digital(PNEU_ORE_PIN, 0);
+  robot->digital(PNEU_LAUNCH_PIN, 0);
 }
 
 /// @brief Called at the end of the match
 void on_end(){
   debug_println("DEBUG: End of cycle triggered");
   // Deactivate the pistons
-  robot->digital(PISTON1_PIN, 0);
-  robot->digital(PISTON2_PIN, 0);
+  robot->digital(PNEU_ORE_PIN, 0);
+  robot->digital(PNEU_LAUNCH_PIN, 0);
 
   // Deactivate all motors
   robot->moveMotor(ORE_MOTOR_PIN, 1, 0);
@@ -42,6 +42,9 @@ void on_end(){
   // Deactivate the solenoid
   robot->digital(SOLENOID_PIN, 0);
   robot->LED(1, 1);
+
+  // Stall forever
+  while (true){}
 }
 
 void end_move_bag(){
@@ -78,13 +81,11 @@ void on_start(){
     TimerManager::register_timer(bag_timer);
 
     // Activate both pistons upon start
-    robot->digital(PISTON1_PIN, 1);
+    robot->digital(PNEU_ORE_PIN, 1);
     
     // Move motor at start
-    debug_println("Moving ore motor");
-    debug_println(ORE_MOTOR_PIN);
-    robot->digital(PISTON2_PIN, 1);
-    robot->moveMotor(ORE_MOTOR_PIN, 2, 255);
+    robot->digital(PNEU_LAUNCH_PIN, 1);
+    robot->moveMotor(ORE_MOTOR_PIN, 1, 255);
 }
 
 void loop() {

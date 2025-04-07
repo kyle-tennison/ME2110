@@ -15,14 +15,14 @@ enum TowerOrientation{
 };
 
 /// @brief Tower Orientation along with the tuned angle
-struct TowerInfo{
+struct TowerConfig{
     TowerOrientation orientation;
     int16_t relative_angle;
 };
 
 /// @brief Read the tower information set by the control panel
-/// @return A `TowerInfo` struct
-TowerInfo read_tower_info();
+/// @return A `TowerConfig` struct
+TowerConfig read_tower_config();
 
 /// @brief Compute the delay required to dispense the dog bone at the correct time
 /// @return An unsigned long integer of the number of milliseconds to wait *after start*
