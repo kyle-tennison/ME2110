@@ -3,6 +3,8 @@
 
 enum OpMode {
   BAG = 0,
+  PWM = 1,
+  BAG_ANIMATE = 2
 };
 
 
@@ -11,6 +13,7 @@ struct CommandPayload {
   bool to;
   bool go;
   bool db; 
+  bool la; 
 };
 
 /// @brief Outbound payload to TS

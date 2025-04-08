@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 function mapMode(num) {
     const map = {
-        0: "BAG"
+        0: "BAG",
+        1: "PWM",
+        2: "BAG ANIMATE"
     };
 
     return map[num] || "Unknown"; // Return "Unknown" for unmapped integers
@@ -36,7 +38,7 @@ function RobotStatusCard() {
         setRobotStatus({
           switch1: data.in1 ? 'ON' : 'OFF',
           switch2: data.in2 ? 'ON' : 'OFF',
-          potentiometer: data.pot, // e.g., "30%"
+          potentiometer: `${data.pot}%`, // e.g., "30%"
           status: "OK",
           mode: mapMode(data.op),
         });

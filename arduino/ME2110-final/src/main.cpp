@@ -21,7 +21,7 @@ void setup() {
   
   // Initialize robot
   robot = new myDuino(1);
-  robot->LED(2, 1);
+  robot->LED(1, 1);
 
   // Make sure pistons are off at startup
   robot->digital(PNEU_ORE_PIN, 0);
@@ -41,7 +41,7 @@ void on_end(){
 
   // Deactivate the solenoid
   robot->digital(SOLENOID_PIN, 0);
-  robot->LED(1, 1);
+  robot->LED(2, 1);
 
   // Stall forever
   while (true){}
@@ -50,7 +50,7 @@ void on_end(){
 void end_move_bag(){
   debug_println("INFO: Stopping bag motor");
 
-  robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
+  robot->moveMotor(BAG_MOTOR_PIN, 1, 50);
 
 }
 

@@ -19,7 +19,7 @@
 
 // Potentiometer values
 #define POTENTIOMETER_MIN 0
-#define POTENTIOMETER_MAX 658
+#define POTENTIOMETER_MAX 678
 
 // Dog bone settings
 #define TUNABLE_WINDOW 90.0 // Tunable window for potentiometer in degrees

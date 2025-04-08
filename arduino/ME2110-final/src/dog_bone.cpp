@@ -10,7 +10,7 @@ TowerConfig read_tower_config(){
 
     // Read the input from the switches
     bool in1 = robot->readButton(TUNE_SWITCH_1) == 1; // switches are flipped
-    bool in2 = robot->readButton(TUNE_SWITCH_2) == 0;
+    bool in2 = robot->readButton(TUNE_SWITCH_2) == 1;
 
     
     uint8_t equiv = (static_cast<uint8_t>(in2) << 1) | static_cast<uint8_t>(in1);

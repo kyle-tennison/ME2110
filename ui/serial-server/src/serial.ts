@@ -37,12 +37,11 @@ catch (error) {
 
 port.on("open", () => {
   console.log("Serial port opened");
-
-  setTimeout(()=>{
-    console.log("Sending test message to Arduino...")
-    sendToArduino("abcd");
-  }, 10000)
 });
+
+port.on("close", () => {
+  console.log("Serial port closed");
+})
 
 const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
 parser.on("data", (data: string) => {

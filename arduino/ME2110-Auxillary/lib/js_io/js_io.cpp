@@ -54,6 +54,7 @@ CommandPayload read_incoming() {
   payload.to = doc["to"];
   payload.go = doc["go"];
   payload.db = doc["db"];
+  payload.la = doc["la"];
 
   debug_println("!Sucessfully deserialized inbound command");
 

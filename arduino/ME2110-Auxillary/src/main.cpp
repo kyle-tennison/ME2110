@@ -5,6 +5,8 @@
 
 
 myDuino* robot = nullptr;
+uint32_t last_heartbeat = 0;
+bool animation_started = false;
 
 void unspool(){
   bool in1, in2;
@@ -28,6 +30,48 @@ void unspool(){
 
 }
 
+void pwm_solenoid(){
+
+  bool in1, in2;
+  in1 = robot->readButton(TUNE_SWITCH_1) == 1;
+  in2 = robot->readButton(TUNE_SWITCH_2) == 1;
+
+  if (in1 && in2){
+    robot->digital(PNEU_ORE_PIN, 1);
+    delay(220);
+    robot->digital(PNEU_ORE_PIN, 0);
+    delay(20);
+  }
+
+}
+
+void animate_bag(){
+  bool in1, in2;
+  in1 = robot->readButton(TUNE_SWITCH_1) == 1;
+  in2 = robot->readButton(TUNE_SWITCH_2) == 1;
+
+  if (!animation_started && in1 && in2){
+    animation_started = true;
+
+    robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
+    delay(500);
+    robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
+    delay(200);
+  
+      for (uint8_t i=0; i<5; i++){
+        robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
+        delay(200);
+        robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
+        delay(200);
+      }
+
+      robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
+      delay(1600);
+      robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
+  }
+
+}
+
 void setup() {
   Serial.begin(115200);
   
@@ -42,8 +86,18 @@ TelemetryPayload read_telem(){
   TelemetryPayload data;
   data.in1 = robot->readButton(TUNE_SWITCH_1) == 1;
   data.in2 = robot->readButton(TUNE_SWITCH_2) == 1;
-  data.pot = (robot->readPOT());
-  data.op = OpMode::BAG;
+  data.pot = static_cast<int16_t>((100* static_cast<int32_t>(robot->readPOT()))/POTENTIOMETER_MAX);
+  
+  if (data.pot < 33){
+    data.op = OpMode::BAG;
+  }
+  else if (data.pot >= 33 && data.pot < 66){
+    data.op = OpMode::PWM;
+  }
+  else if (data.pot >= 66){
+    data.op = OpMode::BAG_ANIMATE;
+  }
+  
 
   return data;
 }
@@ -77,10 +131,18 @@ void dispatch_command(CommandPayload payload){
     debug_println("!Triggering top ore collector OFF");
     robot->moveMotor(ORE_MOTOR_PIN, 1, 0);
   }
+  if (payload.la){
+    debug_println("!Triggerring launch piston ON");
+    robot->digital(PNEU_LAUNCH_PIN, 1);
+  }
+  else{
+    debug_println("!Triggerring launch piston OFF");
+    robot->digital(PNEU_LAUNCH_PIN, 0);
+  }
 
 }
 
-uint32_t last_heartbeat = 0;
+
 
 void loop() {
 
@@ -99,7 +161,19 @@ void loop() {
       dispatch_command(command);
     }
 
+
+
     if (telem.op == OpMode::BAG){
       unspool();
     }
+    if (telem.op == OpMode::PWM){
+      pwm_solenoid();
+    }
+    if (telem.op == OpMode::BAG_ANIMATE){
+      animate_bag();
+    }
+    else{
+      animation_started = false;
+    }
+
 }

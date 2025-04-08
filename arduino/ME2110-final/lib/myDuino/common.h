@@ -26,7 +26,7 @@
 #define PLATE_ROT_PERIOD 10100 // Milliseconds
 
 // Bag settings
-#define BAG_MOTOR_DURATION 4000 // milliseconds
+#define BAG_MOTOR_DURATION 2500 // milliseconds
 #define BAG_START_DELAY 6000 // milliseconds
 
 // Debug command
