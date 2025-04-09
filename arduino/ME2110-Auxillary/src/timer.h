@@ -18,7 +18,7 @@ public:
     /// @param in_millis The number of milliseconds in the future to wait for the timer
     /// @param callback The function to call upon the timer expiring
     /// @return A constructed `Timer` object
-    static Timer schedule(uint32_t in_millis, void (*callback)());
+    static Timer* schedule(uint32_t in_millis, void (*callback)());
 };
 
 

@@ -27,7 +27,7 @@
 
 // Bag settings
 #define BAG_MOTOR_DURATION 2500 // milliseconds
-#define BAG_START_DELAY 6000 // milliseconds
+#define BAG_START_DELAY 20000 // milliseconds
 
 // Debug command
 #define DEBUG

@@ -2,11 +2,14 @@
 #include <myDuino.h>
 #include <common.h>
 #include <js_io.h>
+#include <timer.h>
+
+#define HEARTBEAT_INTERVAL 5000
 
 
 myDuino* robot = nullptr;
 uint32_t last_heartbeat = 0;
-bool animation_started = false;
+bool animation_scheduled = false;
 
 void unspool(){
   bool in1, in2;
@@ -45,30 +48,84 @@ void pwm_solenoid(){
 
 }
 
+bool animation_in_progress = false;
+
 void animate_bag(){
   bool in1, in2;
   in1 = robot->readButton(TUNE_SWITCH_1) == 1;
   in2 = robot->readButton(TUNE_SWITCH_2) == 1;
 
-  if (!animation_started && in1 && in2){
-    animation_started = true;
 
+  if (!animation_scheduled && in1 && in2){
+    animation_scheduled = true;
+
+    // Define reusable closures
+    void (*bag_on)() = []() { if (animation_in_progress) {debug_println("!Timer triggered motor ON"); robot->moveMotor(BAG_MOTOR_PIN, 1, 255);}};
+    void (*bag_off)() = []() { if (animation_in_progress) {debug_println("!Timer triggered motor OFF"); robot->moveMotor(BAG_MOTOR_PIN, 1, 0);}};
+
+    // Phase 1: Pull inward for half a second full power
+    debug_println("!Phase 1 animation start");
     robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
-    delay(500);
-    robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
-    delay(200);
-  
-      for (uint8_t i=0; i<5; i++){
-        robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
-        delay(200);
-        robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
-        delay(200);
-      }
+    Timer::schedule(300, bag_off);
+    Timer::schedule(300, [](){debug_println("!Phase 1 animation done");});
 
-      robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
-      delay(1600);
-      robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
-  }
+
+    // Phase 2: For 2 seconds, jitter on and off
+    for (uint8_t i=0; i<5; i++){
+      Timer::schedule(750 + 400*i, bag_on);
+      Timer::schedule(750 + 400*i + 200, bag_off);
+    }
+    Timer::schedule(2750, [](){debug_println("!Phase 2 animation done");});
+
+    // Phase 3, flip the bag all the way up
+    Timer::schedule(2750, bag_on);
+    Timer::schedule(2750+1300, bag_off);
+    Timer::schedule(2750+1300, [](){debug_println("!Phase 3 animation done");});
+    debug_println("!Scheduled animation timers");
+
+    auto start = millis();
+
+    while ((millis() - start < 4100 )){
+      in1 = robot->readButton(TUNE_SWITCH_1) == 1;
+      in2 = robot->readButton(TUNE_SWITCH_2) == 1;
+
+      if (in1 && in2){
+        animation_in_progress = true;
+      }
+      else {
+        animation_in_progress = false;
+        robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
+        debug_println("!Aborting animation");
+        return;
+      }
+      TimerManager::poll_timers();
+    }
+
+    debug_println("!Bag animation complete");
+
+
+}
+
+
+  // if (!animation_scheduled && in1 && in2){
+  //   animation_scheduled = true;
+
+  //   robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
+  //   delay(500);
+  //   robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
+  //   delay(200);
+  
+  //     for (uint8_t i=0; i<5; i++){
+  //       robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
+  //       delay(200);
+  //       robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
+  //       delay(200);
+  //     }
+
+  //     robot->moveMotor(BAG_MOTOR_PIN, 1, 255);
+  //     delay(1600);
+  //     robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
+  // }
 
 }
 
@@ -147,7 +204,7 @@ void dispatch_command(CommandPayload payload){
 void loop() {
 
   TelemetryPayload telem = read_telem();
-    if (millis() - last_heartbeat > 100){
+    if (millis() - last_heartbeat > HEARTBEAT_INTERVAL){
       send_payload(&telem);
       debug_print("!Available bytes: ");
       debug_println(Serial.available());
@@ -173,7 +230,9 @@ void loop() {
       animate_bag();
     }
     else{
-      animation_started = false;
+      animation_scheduled = false;
     }
+
+    TimerManager::poll_timers();
 
 }

@@ -122,6 +122,5 @@ void dispense_dog_bone(){
 }
 
 void register_dog_bone_timer(){
-    Timer* timer = new Timer(Timer::schedule(compute_dog_bone_delay(), &dispense_dog_bone));
-    TimerManager::register_timer(timer);
+    Timer::schedule(compute_dog_bone_delay(), &dispense_dog_bone);
 }
