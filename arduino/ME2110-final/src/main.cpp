@@ -101,10 +101,14 @@ void on_start(){
 
     Timer::schedule(50, [](){
       // Move motor at start
-      debug_println("INFO: Launching motors");
+      debug_println("INFO: Launching carriage");
       robot->digital(PNEU_LAUNCH_PIN, 1);
       robot->moveMotor(ORE_MOTOR_PIN, 1, 128);
     });
+
+    Timer::schedule(500, [](){
+      // Retract piston to save pressure 
+    })
     
 }
 

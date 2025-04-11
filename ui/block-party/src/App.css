@@ -58,6 +58,8 @@ html, body {
   margin-bottom: 2rem;
   position: relative;
   aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 7px;
   }
   
   .design-overview {

@@ -130,6 +130,6 @@ void register_dog_bone_timer(){
 
     auto db_delay = compute_dog_bone_delay();
     
-    Timer::schedule(db_delay-50, &unlock_dog_bone);
+    Timer::schedule(db_delay-100, &unlock_dog_bone);
     Timer::schedule(db_delay, &dispense_dog_bone);
 }

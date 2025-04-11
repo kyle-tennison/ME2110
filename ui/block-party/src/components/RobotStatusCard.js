@@ -37,6 +37,9 @@ function RobotStatusCard() {
 
     ws.onmessage = (evt) => {
       try {
+        if (evt.data.startsWith("!")){
+          return;
+        }
         const data = JSON.parse(evt.data);
         console.log("Inbound websocket message: ", data)
         setRobotStatus({
