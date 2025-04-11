@@ -10,7 +10,8 @@
 #define TUNE_SWITCH_2 3 // Read; 2nd toggle switch
 #define PNEU_ORE_PIN 4 // Write; 1st pneumatic valve
 #define PNEU_LAUNCH_PIN 3 // Write; 2nd pneumatic valve
-#define SOLENOID_PIN 2 // Write; Dog bone solenoid
+#define DOG_BONE_PIN 2 // Write; Dog bone solenoid
+#define DOG_BONE_LOCK_PIN 1 // Write; Dog bone lock solenoid
 #define ORE_MOTOR_PIN 2 // Motor; 
 #define BAG_MOTOR_PIN 1 // Motor;
 

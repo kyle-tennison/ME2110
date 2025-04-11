@@ -107,7 +107,7 @@ uint32_t compute_dog_bone_delay(){
     debug_print("DEBUG: Angle after considering tuning: ");
     debug_println(target_angle);
 
-    const uint16_t wait_time = static_cast<uint16_t>((target_angle/360)*PLATE_ROT_PERIOD + PLATE_ROT_PERIOD);
+    const uint16_t wait_time = static_cast<uint16_t>((target_angle/360)*PLATE_ROT_PERIOD)+PLATE_ROT_PERIOD;
 
     debug_print("INFO: Waiting for ");
     debug_println(wait_time);
@@ -118,9 +118,18 @@ uint32_t compute_dog_bone_delay(){
 /// @brief Dispense the dog bone by triggering the solenoid release
 void dispense_dog_bone(){
     debug_println("INFO: Dispensing dog bone...");
-    robot->digital(SOLENOID_PIN, 1);
+    robot->digital(DOG_BONE_PIN, 1);
+}
+
+void unlock_dog_bone(){
+    debug_println("INFO: Unlocking dog bone...");
+    robot->digital(DOG_BONE_LOCK_PIN, 0);
 }
 
 void register_dog_bone_timer(){
-    Timer::schedule(compute_dog_bone_delay(), &dispense_dog_bone);
+
+    auto db_delay = compute_dog_bone_delay();
+    
+    Timer::schedule(db_delay-50, &unlock_dog_bone);
+    Timer::schedule(db_delay, &dispense_dog_bone);
 }

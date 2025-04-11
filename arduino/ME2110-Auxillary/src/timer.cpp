@@ -2,8 +2,6 @@
 #include <timer.h>
 #include <common.h>
 
-#define MAX_TIMER_COUNT 16 // number of timers to allocate in memory
-
 Timer::Timer(uint32_t _expiration_time, void (*_callback)()){
     expiration_time = _expiration_time;
     callback = _callback;
@@ -16,10 +14,6 @@ Timer::Timer(uint32_t _expiration_time, void (*_callback)()){
 /// @return A constructed `Timer` object
 Timer* Timer::schedule(uint32_t in_millis, void (*callback)()){
     uint32_t _expiration_time = millis() + in_millis;
-    debug_print("DEBUG: Local time is ");
-    debug_println(millis());
-    debug_print("DEBUG: Expiration time set to ");
-    debug_println(_expiration_time);
     auto timer = new Timer(_expiration_time, callback);
     TimerManager::register_timer(timer);
     return timer;
@@ -32,9 +26,11 @@ void TimerManager::register_timer(Timer* timer){
     for (uint8_t i = 0; i < MAX_TIMER_COUNT; i++){
         if (TimerManager::timers[i] == nullptr) {
             TimerManager::timers[i] = timer;
-            break;
+            return;
         }
     }
+
+    debug_println("!FATAL: TIMER OVERFLOW");
     
 }
 
@@ -56,6 +52,7 @@ void TimerManager::poll_timers(){
         // unregister times that have already been activated
         if (timer->activated){
             TimerManager::timers[i] = nullptr;
+            delete timer;
         }
     }
 }

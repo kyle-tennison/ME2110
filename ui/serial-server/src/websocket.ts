@@ -12,7 +12,7 @@ export function startWebSocketServer(port = 8080) {
         count += 1;
       }
     });
-    console.log(`Relayed message to ${count} clients`)
+    // console.log(`Relayed message to ${count} clients`)
   });
 
     // Listen for incoming messages from clients

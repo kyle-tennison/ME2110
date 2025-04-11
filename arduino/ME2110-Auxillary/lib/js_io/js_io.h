@@ -14,6 +14,7 @@ struct CommandPayload {
   bool go;
   bool db; 
   bool la; 
+  bool dbl;
 };
 
 /// @brief Outbound payload to TS

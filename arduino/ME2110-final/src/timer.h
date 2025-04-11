@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#define MAX_TIMER_COUNT 16 // Number of timers to allocate in memory
+#define MAX_TIMER_COUNT 32 // Number of timers to allocate in memory
 
 /// @brief A callback function registered to go off at a certain point
 class Timer {

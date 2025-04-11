@@ -40,7 +40,7 @@ void on_end(){
   robot->moveMotor(BAG_MOTOR_PIN, 1, 0);
 
   // Deactivate the solenoid
-  robot->digital(SOLENOID_PIN, 0);
+  robot->digital(DOG_BONE_PIN, 0);
   robot->LED(2, 1);
 
   // Stall forever
@@ -50,8 +50,7 @@ void on_end(){
 
 void animate_bag(){
 
-
-  // Define reusable closures
+  // Define reusable lambdas
   void (*bag_on)() = [](){debug_println("Timer triggered motor ON"); robot->moveMotor(BAG_MOTOR_PIN, 1, 255);};
   void (*bag_off)() = [](){debug_println("Timer triggered motor OFF"); robot->moveMotor(BAG_MOTOR_PIN, 1, 0);};
 
@@ -71,8 +70,8 @@ void animate_bag(){
 
   // Phase 3, flip the bag all the way up
   Timer::schedule(2750, bag_on);
-  Timer::schedule(2750+1300, bag_off);
-  Timer::schedule(2750+1300, [](){debug_println("Phase 3 animation done");});
+  Timer::schedule(2750+1350, bag_off);
+  Timer::schedule(2750+1350, [](){debug_println("Phase 3 animation done");});
   debug_println("Scheduled animation timers");
 
 
@@ -92,12 +91,21 @@ void on_start(){
     // Register bag timer
     Timer::schedule(BAG_START_DELAY, &animate_bag);
 
+
+
     // Activate both pistons upon start
     robot->digital(PNEU_ORE_PIN, 1);
+
+    // Lock the solenoid
+    robot->digital(DOG_BONE_LOCK_PIN, 1);
+
+    Timer::schedule(50, [](){
+      // Move motor at start
+      debug_println("INFO: Launching motors");
+      robot->digital(PNEU_LAUNCH_PIN, 1);
+      robot->moveMotor(ORE_MOTOR_PIN, 1, 128);
+    });
     
-    // Move motor at start
-    robot->digital(PNEU_LAUNCH_PIN, 1);
-    robot->moveMotor(ORE_MOTOR_PIN, 1, 255);
 }
 
 void loop() {

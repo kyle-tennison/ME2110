@@ -4,7 +4,7 @@
 #include <js_io.h>
 #include <timer.h>
 
-#define HEARTBEAT_INTERVAL 5000
+#define HEARTBEAT_INTERVAL 100
 
 
 myDuino* robot = nullptr;
@@ -129,14 +129,6 @@ void animate_bag(){
 
 }
 
-void setup() {
-  Serial.begin(115200);
-  
-  // Initialize robot
-  robot = new myDuino(1);
-  robot->LED(1, 1);
-}
-
 /// @brief Read the telemetry of the robot
 /// @return A TelemetryPayload struct
 TelemetryPayload read_telem(){
@@ -166,11 +158,11 @@ void dispatch_command(CommandPayload payload){
   
   if (payload.db){
     debug_println("!Triggerring dog bone ON");
-    robot->digital(SOLENOID_PIN, 1);
+    robot->digital(DOG_BONE_PIN, 1);
   }
   else{
     debug_println("!Triggerring dog bone OFF");
-    robot->digital(SOLENOID_PIN, 0);
+    robot->digital(DOG_BONE_PIN, 0);
   };
   if (payload.go){
     debug_println("!Triggerring bottom ore collector ON");
@@ -182,7 +174,7 @@ void dispatch_command(CommandPayload payload){
   }
   if (payload.to){
     debug_println("!Triggering top ore collector ON");
-    robot->moveMotor(ORE_MOTOR_PIN, 1, 255);
+    robot->moveMotor(ORE_MOTOR_PIN, 1, 80);
   }
   else {
     debug_println("!Triggering top ore collector OFF");
@@ -196,18 +188,51 @@ void dispatch_command(CommandPayload payload){
     debug_println("!Triggerring launch piston OFF");
     robot->digital(PNEU_LAUNCH_PIN, 0);
   }
+  if (payload.dbl){
+    debug_println("!Triggering dog bone lock ON");
+    robot->digital(DOG_BONE_LOCK_PIN, 1);
+  }
+  else{
+    debug_println("!Triggering dog bone lock OFF");
+    robot->digital(DOG_BONE_LOCK_PIN, 0);
+  }
 
 }
 
 
+int availableMemory() {
+  // Use 1024 with ATmega168
+  int size = 2048;
+  byte *buf;
+  while ((buf = (byte *) malloc(--size)) == NULL);
+      free(buf);
+  return size;
+}
+
+void flash_light();
+
+void flash_light(){
+  robot->LED(2, 1);
+  Timer::schedule(250, [](){robot->LED(2, 0);});
+  Timer::schedule(500, [](){flash_light();});
+}
+
+void setup() {
+  Serial.begin(115200);
+  
+  // Initialize robot
+  robot = new myDuino(1);
+  robot->LED(2, 1);
+
+  flash_light();
+
+}
 
 void loop() {
 
   TelemetryPayload telem = read_telem();
     if (millis() - last_heartbeat > HEARTBEAT_INTERVAL){
       send_payload(&telem);
-      debug_print("!Available bytes: ");
-      debug_println(Serial.available());
       last_heartbeat=millis();
     }
 

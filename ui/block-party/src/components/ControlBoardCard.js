@@ -4,6 +4,7 @@ function ControlBoardCard() {
   const [topOre, setTopOre] = useState(false);
   const [groundOre, setGroundOre] = useState(false);
   const [dogBone, setDogBone] = useState(false);
+  const [dogBoneLock, setDogBoneLock] = useState(false);
   const [launch, setLaunch] = useState(false);
 
   // Create a ref to hold the WebSocket
@@ -42,7 +43,8 @@ function ControlBoardCard() {
       to: topOre,
       go: groundOre,
       db: dogBone,
-      la: launch
+      la: launch,
+      dbl: dogBoneLock,
     };
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify(payload));
@@ -50,7 +52,7 @@ function ControlBoardCard() {
     } else {
       console.error('WebSocket is not connected.');
     }
-  }, [topOre, groundOre, dogBone, launch]);
+  }, [topOre, groundOre, dogBone, dogBoneLock, launch]);
 
   // Toggle functions simply update the local state.
   const toggleTopOre = () => {
@@ -63,6 +65,9 @@ function ControlBoardCard() {
 
   const toggleDogBone = () => {
     setDogBone(prev => !prev);
+  };
+  const toggleDogBoneLock = () => {
+    setDogBoneLock(prev => !prev);
   };
   const toggleLaunch = () => {
     setLaunch(prev => !prev);
@@ -77,7 +82,7 @@ function ControlBoardCard() {
         handleToggle={toggleTopOre}
       />
       <Toggle 
-        label="Ground Ore Collector"
+        label="Ground Ore Collector ⚠︎"
         isOn={groundOre}
         handleToggle={toggleGroundOre}
       />
@@ -85,6 +90,11 @@ function ControlBoardCard() {
         label="Dog Bone"
         isOn={dogBone}
         handleToggle={toggleDogBone}
+      />
+      <Toggle 
+        label="Dog Bone Lock"
+        isOn={dogBoneLock}
+        handleToggle={toggleDogBoneLock}
       />
       <Toggle 
         label="Launch"

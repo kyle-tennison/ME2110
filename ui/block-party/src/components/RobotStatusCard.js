@@ -31,6 +31,10 @@ function RobotStatusCard() {
       console.log('WebSocket connected');
     };
 
+    ws.onclose = (() => {
+      setRobotStatus(defaultStatus);
+    });
+
     ws.onmessage = (evt) => {
       try {
         const data = JSON.parse(evt.data);
